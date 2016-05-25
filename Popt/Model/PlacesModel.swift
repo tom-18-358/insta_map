@@ -45,15 +45,34 @@ class PlacesModel: NSObject {
     }
     
     /**
+     PlaceIdからPlaceModelを返す
+     
+     - parameter placeId: PlaceID
+     
+     - returns: PlaceModel
+     */
+    func getPlaceByPlaceId(placeId: String) -> PlaceModel? {
+        var _place: PlaceModel?
+        self.list.forEach{ place in
+            if place.id == placeId {
+                _place = place // FIXME: return place でなぜかエラーが出る・・・
+            }
+        }
+
+        return _place
+    }
+    
+    /**
      placeIdから該当の配列Numを返す
      
      - parameter Id: String PlaceModel.id
+     
      - returns:      Int    配列の位置
      */
-    func getIdRowNum(Id: String) -> Int {
+    func getIdRowNum(placeId: String) -> Int {
         var num: Int = 0
         self.list.forEach{place in
-            if place.id == Id {
+            if place.id == placeId {
                 num = self.list.indexOf(place)!
             }
         }

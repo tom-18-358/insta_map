@@ -80,10 +80,10 @@ class PlacesViewController: UIViewController, CurrentLocationDelegate, PlacesMod
     
     
 //MARK: - private method
-    private func goArticleView(place: PlaceModel) {
+    private func goArticleView(placeId: String) {
         let VC = UIStoryboard(name: "ArticlesViewController", bundle: nil)
         let articlesVC: ArticlesViewController = VC.instantiateViewControllerWithIdentifier("ArticlesViewController") as! ArticlesViewController
-        articlesVC.place = place
+        articlesVC.place = self.places.getPlaceByPlaceId(placeId)
         self.presentViewController(articlesVC, animated: true, completion: nil)
     }
 
