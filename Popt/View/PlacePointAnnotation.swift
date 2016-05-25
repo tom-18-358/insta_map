@@ -11,6 +11,6 @@ import MapKit
 
 class PlacePointAnnotation : MKPointAnnotation {
     
-    var place : PlacesModel.Place! = nil
+    var place : PlaceModel! = nil
     
 }

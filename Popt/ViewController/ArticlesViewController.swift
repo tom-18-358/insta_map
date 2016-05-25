@@ -12,7 +12,7 @@ import AlamofireImage
 
 class ArticlesViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
     
-    var place : PlacesModel.Place!
+    var place : PlaceModel!
     
     override func viewDidLoad() {
         super.viewDidLoad()

@@ -10,7 +10,14 @@ import UIKit
 import SwiftyJSON
 import SVProgressHUD
 
+protocol AriticlesModelDelegate {
+    func getedArticles()
+}
+
+
 class ArticlesModel: NSObject {
+    
+    var ATdelefate: AriticlesModelDelegate!
     
     /**
      *  記事データ
@@ -65,6 +72,8 @@ class ArticlesModel: NSObject {
         generateArticleByUrl(nextUrl!)
     }
     
+    
+// MARK: - PrivateMethod
     /**
      取得した記事を構造体にはめ込む
      
@@ -106,6 +115,7 @@ class ArticlesModel: NSObject {
             self.list.append(articleStruct)
         }
         self.list = self.list.sort { $0.likeCount < $1.likeCount }
+        self.ATdelefate.getedArticles()
     }
 
 }

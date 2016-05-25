@@ -17,27 +17,9 @@ protocol PlacesModelDelegate {
 
 class PlacesModel: NSObject {
     
-    var list : [Place] = []
+    var list : [PlaceModel] = []
     var PMDelegate  : PlacesModelDelegate!
-        
-    // 場所情報と記事データ
-    struct Place {
-        let id       : String!
-        let name     : String!
-        let lat      : Double!
-        let lng      : Double!
-        let articles : ArticlesModel!
-        func generateArticles() {
-            let url = API.INSTA.BASE_URL
-                + API.INSTA.PRAM.LOCATIONS
-                + "/" + self.id
-                + API.INSTA.PRAM.MEDIA_RECENT
-                + API.INSTA.PRAM.ACCESS_TOKEN
-            
-            self.articles.generateArticleByUrl(url)
-        }
-    }
-    
+
     /**
      緯度経度から付近の場所リストを取得
      
@@ -62,19 +44,42 @@ class PlacesModel: NSObject {
         )
     }
     
+    /**
+     placeIdから該当の配列Numを返す
+     
+     - parameter Id: String PlaceModel.id
+     - returns:      Int    配列の位置
+     */
+    func getIdRowNum(Id: String) -> Int {
+        var num: Int = 0
+        self.list.forEach{place in
+            if place.id == Id {
+                num = self.list.indexOf(place)!
+            }
+        }
+        return num
+    }
+    
+    
+// MARK: - PrivateMethod
+    /**
+     取得した情報をPlaceModelにはめ込む
+     
+     - parameter result: APIより取得した場所一覧
+     */
     private func setPlace(result: JSON){
         let places = result["data"]
         places.forEach{(id, place) in
-            let placeStruct = Place(
-                id       : place["id"].string,
-                name     : place["name"].string,
-                lat      : place["latitude"].double,
-                lng      : place["longitude"].double,
-                articles : ArticlesModel()
+            let placeModel = PlaceModel(
+                id:   place["id"].string!,
+                name: place["name"].string!,
+                lat:  place["latitude"].double!,
+                lng:  place["longitude"].double!
             )
-            placeStruct.generateArticles()
-            self.list.append(placeStruct)
+            placeModel.generateArticles()
+            self.list.append(placeModel)
         }
         self.PMDelegate.getedPlaces()
     }
+    
 }

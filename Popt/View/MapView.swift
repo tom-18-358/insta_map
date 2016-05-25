@@ -19,7 +19,7 @@ class MapView: MKMapView {
         self.setRegion(myRegion, animated: true)
     }
     
-    func setPin(place: PlacesModel.Place) {
+    func setPin(place: PlaceModel) {
         let pin = PlacePointAnnotation()
         let center: CLLocationCoordinate2D = CLLocationCoordinate2DMake(place.lat, place.lng)
         pin.coordinate = center

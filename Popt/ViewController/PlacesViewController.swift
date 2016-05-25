@@ -12,7 +12,7 @@ import SVProgressHUD
 import SwiftyJSON
 import AlamofireImage
 
-class PlacesViewController: UIViewController, CurrentLocationDelegate ,MKMapViewDelegate, PlacesModelDelegate, UITableViewDelegate, UITableViewDataSource {
+class PlacesViewController: UIViewController, CurrentLocationDelegate, PlacesModelDelegate ,MKMapViewDelegate, UITableViewDelegate, UITableViewDataSource {
     
     private var CLLocation : CurrentLocationModel!
     @IBOutlet weak var mapView: MapView!
@@ -22,7 +22,6 @@ class PlacesViewController: UIViewController, CurrentLocationDelegate ,MKMapView
     private var clLng: CLLocationDegrees!
     
     private var places: PlacesModel!
-    private var refreshControler: UIRefreshControl?
     
 //MARK: - VIEW method
     override func viewDidLoad() {
@@ -43,10 +42,15 @@ class PlacesViewController: UIViewController, CurrentLocationDelegate ,MKMapView
         self.tableView.layer.shadowOpacity = 0.6
         self.tableView.separatorStyle = .None
         
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PlacesViewController.updatePlaceCell(_:)), name: "updatePlaceInfo", object: nil)
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
+    }
+    
+    deinit{
+        NSNotificationCenter.defaultCenter().delete(self)
     }
     
 
@@ -68,13 +72,12 @@ class PlacesViewController: UIViewController, CurrentLocationDelegate ,MKMapView
             self.mapView.setPin(place)
         }
         self.tableView.reloadData()
-        self.tableView.layoutIfNeeded()
         SVProgressHUD.dismiss()
     }
     
     
 //MARK: - private method
-    private func goArticleView(place: PlacesModel.Place) {
+    private func goArticleView(place: PlaceModel) {
         let VC = UIStoryboard(name: "ArticlesViewController", bundle: nil)
         let articlesVC: ArticlesViewController = VC.instantiateViewControllerWithIdentifier("ArticlesViewController") as! ArticlesViewController
         articlesVC.place = place
@@ -107,18 +110,34 @@ class PlacesViewController: UIViewController, CurrentLocationDelegate ,MKMapView
         SVProgressHUD.show()
         self.places.generatePlaces(tapedLocation.latitude, lng: tapedLocation.longitude)
     }
+
+    
+// MARK: - ObserberMethod
+    // Place情報update時にcellを更新
+    func updatePlaceCell(notification: NSNotification){
+        guard let placeId = notification.userInfo!["id"] else {
+            return
+        }
+        let row = NSIndexPath(forRow: self.places.getIdRowNum(placeId as! String), inSection: 0)
+        self.tableView.reloadRowsAtIndexPaths([row], withRowAnimation: UITableViewRowAnimation.Fade)
+    }
     
     
 // MARK: - UITableViewDelegate Protocol
     //セル数を指定
     func tableView(table: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.places.list.count
+        guard let num: Int = self.places.list.count else {
+            return 0
+        }
+        return num
     }
     
     //各セルの要素を設定する
     func tableView(table: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let place : PlacesModel.Place = places.list[indexPath.row]
+        let place : PlaceModel = places.list[indexPath.row]
         let customCell = table.dequeueReusableCellWithIdentifier("tableCell", forIndexPath: indexPath) as! PlaceTableViewCell
+        customCell.placeLable.text = place.name
+        customCell.setShadow()
         guard let url: NSURL = place.articles.displayedArticle?.imgLink.thumbnailUrl else {
             return customCell
         }
@@ -127,10 +146,8 @@ class PlacesViewController: UIViewController, CurrentLocationDelegate ,MKMapView
             radius: 32.0
         )
         customCell.placeImg.af_setImageWithURL(url, placeholderImage: nil, filter: filter)
-        customCell.placeLable.text        = place.name
         customCell.likeCountLabel.text    = String(place.articles.totalLikeCount!)
         customCell.articleCountLabel.text = String(place.articles.list.count)
-        customCell.setShadow()
         return customCell
     }
 
