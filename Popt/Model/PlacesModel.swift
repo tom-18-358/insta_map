@@ -76,8 +76,10 @@ class PlacesModel: NSObject {
                 lat:  place["latitude"].double!,
                 lng:  place["longitude"].double!
             )
-            placeModel.generateArticles()
-            self.list.append(placeModel)
+            if placeModel.id != "0" {
+                placeModel.generateArticles()
+                self.list.append(placeModel)
+            }
         }
         self.PMDelegate.getedPlaces()
     }
