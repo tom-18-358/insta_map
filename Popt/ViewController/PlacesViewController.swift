@@ -134,12 +134,13 @@ class PlacesViewController: UIViewController, CurrentLocationDelegate, PlacesMod
     }
     
     
-// MARK: - UITableViewDelegate Protocol
-    // スクロールを検知
+// MARK: - UIScrollViewDelegate
     func scrollViewDidScroll(scrollView: UIScrollView) {
         printTopCell()
     }
+
     
+// MARK: - UITableViewDelegate Protocol
     //セル数を指定
     func tableView(table: UITableView, numberOfRowsInSection section: Int) -> Int {
         guard let num: Int = self.places.list.count else {

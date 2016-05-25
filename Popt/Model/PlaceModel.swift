@@ -36,6 +36,8 @@ class PlaceModel: NSObject, AriticlesModelDelegate {
         self.articles.generateArticleByUrl(url)
     }
     
+    
+// MARK: - AriticlesModelDelegate Protocol
     func getedArticles() {
         let n : NSNotification = NSNotification(name: "updatePlaceInfo", object: self, userInfo: ["id": self.id])
         NSNotificationCenter.defaultCenter().postNotification(n)
