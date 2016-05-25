@@ -33,6 +33,7 @@ class MapView: MKMapView {
             let customAnnotation = annotation as! PlacePointAnnotation
             if customAnnotation.placeId == placeId {
                 self.selectAnnotation(annotation, animated: true)
+                self.setMap(annotation.coordinate.latitude, clLng: annotation.coordinate.longitude)
             }
         }
     }
