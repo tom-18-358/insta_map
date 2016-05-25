@@ -10,17 +10,38 @@ import UIKit
 import SVProgressHUD
 import AlamofireImage
 
-class ArticlesViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
+class ArticlesViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, AriticlesModelDelegate {
     
     var place : PlaceModel!
+    var upDating: Bool = false
+    
+    @IBOutlet weak var collectionView: UICollectionView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.place.articles.generateNextArticles()
+        self.place.articles.ATdelefate = self
     }
     
     @IBAction func closePage(sender: AnyObject) {
         self.dismissViewControllerAnimated(true, completion: nil)
+    }
+
+    
+// MARK: - AriticlesModelDelegate Protocol
+    func getedArticles() {
+        upDating = false
+        self.collectionView.reloadData()
+    }
+    
+
+// MARK: - UIScrollViewDelegate
+    func scrollViewDidScroll(scrollView: UIScrollView) {
+        if self.collectionView.contentOffset.y >= (self.collectionView.contentSize.height - self.collectionView.bounds.size.height) {
+            if upDating == false {
+                upDating = true
+                self.place.articles.generateNextArticles()
+            }
+        }
     }
 
     
