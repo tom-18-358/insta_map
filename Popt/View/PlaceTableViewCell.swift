@@ -15,6 +15,7 @@ class PlaceTableViewCell: UITableViewCell {
     @IBOutlet weak var placeLable: UILabel!
     @IBOutlet weak var likeCountLabel: UILabel!
     @IBOutlet weak var articleCountLabel: UILabel!
+    var placeId: String!
     
     func setShadow() {
         self.baseView.layer.shadowOffset = CGSizeMake(1, 2)

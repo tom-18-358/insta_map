@@ -11,6 +11,6 @@ import MapKit
 
 class PlacePointAnnotation : MKPointAnnotation {
     
-    var place : PlaceModel! = nil
+    var placeId: String!
     
 }

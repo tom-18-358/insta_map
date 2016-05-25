@@ -23,6 +23,8 @@ class PlacesViewController: UIViewController, CurrentLocationDelegate, PlacesMod
     
     private var places: PlacesModel!
     
+    private var topTableCellId: String?
+    
 //MARK: - VIEW method
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -73,6 +75,7 @@ class PlacesViewController: UIViewController, CurrentLocationDelegate, PlacesMod
         }
         self.tableView.reloadData()
         SVProgressHUD.dismiss()
+        printTopCell()
     }
     
     
@@ -83,18 +86,26 @@ class PlacesViewController: UIViewController, CurrentLocationDelegate, PlacesMod
         articlesVC.place = place
         self.presentViewController(articlesVC, animated: true, completion: nil)
     }
+
+    // 表示されているtopCellを算出
+    private func printTopCell(){
+        let rows = self.tableView.visibleCells
+        let row = rows[0] as! PlaceTableViewCell
+        if topTableCellId == row.placeId {
+            return
+        }
+        topTableCellId = row.placeId
+        self.mapView.selectByPlaceId(topTableCellId!)
+    }
+
     
 
 //MARK: - tapedMethod
     // tableCell tap時に記事一覧に遷移
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {        
-        self.goArticleView(places.list[indexPath.row])
-    }
-    
-    // pin tap時に記事一覧に遷移
-    func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
-        let annotation = view.annotation as! PlacePointAnnotation
-        self.goArticleView(annotation.place)
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        let cell = self.tableView.cellForRowAtIndexPath(indexPath) as! PlaceTableViewCell
+        self.mapView.selectByPlaceId(cell.placeId)
+        self.goArticleView(cell.placeId)
     }
     
     // map 長押しした箇所の投稿を取得
@@ -124,6 +135,11 @@ class PlacesViewController: UIViewController, CurrentLocationDelegate, PlacesMod
     
     
 // MARK: - UITableViewDelegate Protocol
+    // スクロールを検知
+    func scrollViewDidScroll(scrollView: UIScrollView) {
+        printTopCell()
+    }
+    
     //セル数を指定
     func tableView(table: UITableView, numberOfRowsInSection section: Int) -> Int {
         guard let num: Int = self.places.list.count else {
@@ -134,13 +150,14 @@ class PlacesViewController: UIViewController, CurrentLocationDelegate, PlacesMod
     
     //各セルの要素を設定する
     func tableView(table: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let place : PlaceModel = places.list[indexPath.row]
         let customCell = table.dequeueReusableCellWithIdentifier("tableCell", forIndexPath: indexPath) as! PlaceTableViewCell
+        
+        guard let place : PlaceModel = places.list[indexPath.row] else { return customCell }
         customCell.placeLable.text = place.name
+        customCell.placeId         = place.id
         customCell.setShadow()
-        guard let url: NSURL = place.articles.displayedArticle?.imgLink.thumbnailUrl else {
-            return customCell
-        }
+        
+        guard let url: NSURL = place.articles.displayedArticle?.imgLink.thumbnailUrl else { return customCell }
         let filter = AspectScaledToFillSizeWithRoundedCornersFilter(
             size: customCell.placeImg.frame.size,
             radius: 32.0

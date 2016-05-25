@@ -24,8 +24,17 @@ class MapView: MKMapView {
         let center: CLLocationCoordinate2D = CLLocationCoordinate2DMake(place.lat, place.lng)
         pin.coordinate = center
         pin.title      = place.name
-        pin.place      = place
+        pin.placeId    = place.id
         self.addAnnotation(pin)
+    }
+    
+    func selectByPlaceId(placeId: String) {
+        self.annotations.forEach{annotation in
+            let customAnnotation = annotation as! PlacePointAnnotation
+            if customAnnotation.placeId == placeId {
+                self.selectAnnotation(annotation, animated: true)
+            }
+        }
     }
 
 }
