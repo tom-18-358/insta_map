@@ -70,6 +70,7 @@ class ArticlesModel: NSObject {
             return
         }
         generateArticleByUrl(nextUrl!)
+        nextUrl = nil
     }
     
     
