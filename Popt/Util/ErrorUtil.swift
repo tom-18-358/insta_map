@@ -37,7 +37,7 @@ class ErrorUtil: NSObject {
     func alert(text : AnyObject){
         self.slack.postToChannel(
             text as! String,
-            channel: API.SLACK.WEB_HOOK_URL.WARNING_CH
+            channel: API.SLACK.WEB_HOOK_URL.ALERT_CH
         )
     }
     

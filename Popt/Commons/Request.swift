@@ -13,7 +13,6 @@ import SVProgressHUD
 
 protocol RequestDelegate {
     func success(result: JSON)
-    func faild()
 }
 
 class Request: NSObject {
@@ -46,12 +45,12 @@ class Request: NSObject {
                 url,
                 parameters: body,
                 encoding: .JSON,
-                headers: header)
-                .responseString(completionHandler: { response in
-                    if !response.description.containsString("SUCCESS") {
-                        ErrorUtil.shared.warningNotPostSlack(response.debugDescription)
-                    }
-                })
+                headers: header
+            ).response { (request, response, data, error) -> Void in
+                if response?.statusCode != 200 {
+                    ErrorUtil.shared.warningNotPostSlack(response.debugDescription)
+                }
+            }
             return
         }
         
@@ -60,17 +59,17 @@ class Request: NSObject {
             url,
             parameters: body,
             encoding: .JSON,
-            headers: header)
-            // TODO:errorハンドリングせねば
-            .responseJSON { response in
-                guard let _response = response.result.value else {
-                    ErrorUtil.shared.warning(" - API取得失敗 \n url : " + url)
-                    print(response)
-                    self.requestDelegate?.faild()
-                    return
-                }
-                
-                callBack(result: JSON(_response))
+            headers: header
+        ).responseJSON { response in
+            guard let _response = response.result.value else {
+                ErrorUtil.shared.warning("API取得失敗 \n  url : \(url) \n  response : \(response)")
+                return
+            }
+            if response.result.isFailure {
+                ErrorUtil.shared.warning("API取得失敗 \n  url : \(url) \n  response : \(response)")
+                return
+            }
+            callBack(result: JSON(_response))
         }
     }
     

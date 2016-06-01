@@ -13,9 +13,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
+        
+        //エラーハンドリング - slack通知されず・・・
+        NSSetUncaughtExceptionHandler{ exception in
+            let alertText: String = "name: \(exception.name)\nreason: \(exception.reason) \ncallStackSymbols: \(exception.callStackSymbols)"
+            ErrorUtil.shared.alert(alertText)
+        }
         return true
     }
 
