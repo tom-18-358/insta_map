@@ -36,10 +36,31 @@ class Request: NSObject {
      - parameter url:      API URL
      - parameter callBack: 取得成功時のcallBack関数
      */
-    func request(method : String, url : String, callBack:(result : JSON) -> Void) -> Void {
+    func request(method: String, url: String, body: [String: String]? ,header: [String: String]? ,callBack:(result : JSON) -> Void) -> Void {
         self.convertMethod(method)
         
-        Alamofire.request(_method, url)
+        //Slack通知の時はrespoceがStringなので別処理
+        if url.containsString(API.SLACK.WEB_HOOK_URL.BASE) {
+            Alamofire.request(
+                _method,
+                url,
+                parameters: body,
+                encoding: .JSON,
+                headers: header)
+                .responseString(completionHandler: { response in
+                    if !response.description.containsString("SUCCESS") {
+                        ErrorUtil.shared.warningNotPostSlack(response.debugDescription)
+                    }
+                })
+            return
+        }
+        
+        Alamofire.request(
+            _method,
+            url,
+            parameters: body,
+            encoding: .JSON,
+            headers: header)
             // TODO:errorハンドリングせねば
             .responseJSON { response in
                 guard let _response = response.result.value else {

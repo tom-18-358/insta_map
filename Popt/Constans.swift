@@ -30,9 +30,13 @@ struct API {
             static let DISTANCE     = "&distance="
         }
     }
-    
-    struct GOOGLE_MAP {
-        static let API_KEY = "AIzaSyBGEKokIgWdHhhfda9P1DV5uwUANNoXACA"
+
+    struct SLACK {
+        struct WEB_HOOK_URL {
+            static let BASE       = "https://hooks.slack.com/services/"
+            static let WARNING_CH = API.SLACK.WEB_HOOK_URL.BASE + "TYPE_CH"
+            static let ALERT_CH   = API.SLACK.WEB_HOOK_URL.BASE + "TYPE_CH"
+        }
     }
 }
 

@@ -58,6 +58,8 @@ class ArticlesModel: NSObject {
         Request.shared.request(
             HTTP_METHOD.GET,
             url: url,
+            body:  nil,
+            header:  nil,
             callBack: {(result : JSON) -> Void in
                 self.setArticle(result)
             }
