@@ -25,17 +25,13 @@ class PlacesViewController: UIViewController, CurrentLocationDelegate, PlacesMod
     
     private var topTableCellId: String?
     
-//MARK: - VIEW method
+//MARK: - LIFE CYCLE
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // 現在位置取得
-        self.CLLocation = CurrentLocationModel()
-        self.CLLocation.CLDelegate = self
-        self.CLLocation.getLocation()
-        
-        self.places = PlacesModel()
-        self.places.PMDelegate = self
+        setObserver()
+        requestCurrentLocation()
+        requestPlaceAndArticle()
         
         self.tableView.delegate = self
         self.mapView.delegate = self
@@ -43,21 +39,44 @@ class PlacesViewController: UIViewController, CurrentLocationDelegate, PlacesMod
         self.tableView.layer.shadowOffset = CGSizeMake(-1, -2)
         self.tableView.layer.shadowOpacity = 0.6
         self.tableView.separatorStyle = .None
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PlacesViewController.updatePlaceCell(_:)), name: "updatePlaceInfo", object: nil)
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
     
+//MARK: - Observer設定
+    private func setObserver() {
+        NSNotificationCenter.defaultCenter().addObserver(
+        self,
+        selector: #selector(PlacesViewController.updatePlaceCell(_:)),
+        name: "updatePlaceInfo",
+        object: nil
+        )
+    }
+
     deinit{
         NSNotificationCenter.defaultCenter().delete(self)
     }
     
+    // Place情報update時にcellを更新
+    func updatePlaceCell(notification: NSNotification){
+        guard let placeId = notification.userInfo!["id"] else {
+            return
+        }
+        let row = NSIndexPath(forRow: self.places.getIdRowNum(placeId as! String), inSection: 0)
+        self.tableView.reloadRowsAtIndexPaths([row], withRowAnimation: UITableViewRowAnimation.Fade)
+    }
+    
 
-//MARK: - CurrentLocationDelegate method
-    // 現在位置取得成功
+//MARK: - 現在位置取得
+    private func requestCurrentLocation(){
+        self.CLLocation = CurrentLocationModel()
+        self.CLLocation.CLDelegate = self
+        self.CLLocation.getLocation()
+    }
+    
+    // 取得成功 - CurrentLocationDelegate method
     func getedLocation() {
         self.clLat = self.CLLocation.lat!
         self.clLng = self.CLLocation.lng!
@@ -67,8 +86,13 @@ class PlacesViewController: UIViewController, CurrentLocationDelegate, PlacesMod
     }
     
     
-//MARK: - PlacesModelDelegate method
-    // 付近の投稿情報の取得成功
+//MARK: - Instaより場所,投稿を取得
+    private func requestPlaceAndArticle() {
+        self.places = PlacesModel()
+        self.places.PMDelegate = self
+    }
+    
+    // 取得成功 - PlacesModelDelegate method
     func getedPlaces() {
         self.places.list.forEach{ place in
             self.mapView.setPin(place)
@@ -86,27 +110,9 @@ class PlacesViewController: UIViewController, CurrentLocationDelegate, PlacesMod
         articlesVC.place = self.places.getPlaceByPlaceId(placeId)
         self.presentViewController(articlesVC, animated: true, completion: nil)
     }
-
-    // 表示されているtopCellを算出
-    private func printTopCell(){
-        let rows = self.tableView.visibleCells
-        let row = rows[0] as! PlaceTableViewCell
-        if topTableCellId == row.placeId {
-            return
-        }
-        topTableCellId = row.placeId
-        self.mapView.selectByPlaceId(topTableCellId!)
-    }
-
     
 
-//MARK: - tapedMethod
-    // tableCell tap時に記事一覧に遷移
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let cell = self.tableView.cellForRowAtIndexPath(indexPath) as! PlaceTableViewCell
-        self.mapView.selectByPlaceId(cell.placeId)
-        self.goArticleView(cell.placeId)
-    }
+//MARK: - UIMapView
     
     // map 長押しした箇所の投稿を取得
     @IBAction func longPress(sender: AnyObject) {
@@ -121,27 +127,26 @@ class PlacesViewController: UIViewController, CurrentLocationDelegate, PlacesMod
         SVProgressHUD.show()
         self.places.generatePlaces(tapedLocation.latitude, lng: tapedLocation.longitude)
     }
-
-    
-// MARK: - ObserberMethod
-    // Place情報update時にcellを更新
-    func updatePlaceCell(notification: NSNotification){
-        guard let placeId = notification.userInfo!["id"] else {
-            return
-        }
-        let row = NSIndexPath(forRow: self.places.getIdRowNum(placeId as! String), inSection: 0)
-        self.tableView.reloadRowsAtIndexPaths([row], withRowAnimation: UITableViewRowAnimation.Fade)
-    }
     
     
-// MARK: - UIScrollViewDelegate
+// MARK: - UIScrollView
     func scrollViewDidScroll(scrollView: UIScrollView) {
         printTopCell()
     }
+    
+    // 表示されているtopCellを算出
+    private func printTopCell(){
+        let rows = self.tableView.visibleCells
+        let row = rows[0] as! PlaceTableViewCell
+        if topTableCellId == row.placeId {
+            return
+        }
+        topTableCellId = row.placeId
+        self.mapView.selectByPlaceId(topTableCellId!)
+    }
 
     
-// MARK: - UITableViewDelegate Protocol
-    //セル数を指定
+// MARK: - UITableView
     func tableView(table: UITableView, numberOfRowsInSection section: Int) -> Int {
         guard let num: Int = self.places.list.count else {
             return 0
@@ -149,7 +154,6 @@ class PlacesViewController: UIViewController, CurrentLocationDelegate, PlacesMod
         return num
     }
     
-    //各セルの要素を設定する
     func tableView(table: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let customCell = table.dequeueReusableCellWithIdentifier("tableCell", forIndexPath: indexPath) as! PlaceTableViewCell
         
@@ -167,6 +171,13 @@ class PlacesViewController: UIViewController, CurrentLocationDelegate, PlacesMod
         customCell.likeCountLabel.text    = String(place.articles.totalLikeCount!)
         customCell.articleCountLabel.text = String(place.articles.list.count)
         return customCell
+    }
+    
+    // tableCell tap時に記事一覧に遷移
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        let cell = self.tableView.cellForRowAtIndexPath(indexPath) as! PlaceTableViewCell
+        self.mapView.selectByPlaceId(cell.placeId)
+        self.goArticleView(cell.placeId)
     }
 
 }
