@@ -66,7 +66,10 @@ class CurrentLocationModel: NSObject, CLLocationManagerDelegate {
     // 現状のステータス状態を表示します
     func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
         if status != .AuthorizedAlways && status != .AuthorizedWhenInUse {
-            ErrorUtil.shared.warning("CLAuthorizationStatus: 現在位置取得許可されていません")
+            ErrorUtil.shared.warning(
+                "CLAuthorizationStatus: 現在位置取得許可されていません",
+                toCustomerText: "現在位置の取得が許可されていません"
+            )
         }
     }
     

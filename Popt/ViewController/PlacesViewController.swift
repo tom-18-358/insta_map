@@ -48,10 +48,16 @@ class PlacesViewController: UIViewController, CurrentLocationDelegate, PlacesMod
 //MARK: - Observer設定
     private func setObserver() {
         NSNotificationCenter.defaultCenter().addObserver(
-        self,
-        selector: #selector(PlacesViewController.updatePlaceCell(_:)),
-        name: "updatePlaceInfo",
-        object: nil
+            self,
+            selector: #selector(PlacesViewController.updatePlaceCell(_:)),
+            name: "updatePlaceInfo",
+            object: nil
+        )
+        NSNotificationCenter.defaultCenter().addObserver(
+            self,
+            selector: #selector(PlacesViewController.showAlert(_:)),
+            name: "showAlert",
+            object: nil
         )
     }
 
@@ -66,6 +72,28 @@ class PlacesViewController: UIViewController, CurrentLocationDelegate, PlacesMod
         }
         let row = NSIndexPath(forRow: self.places.getIdRowNum(placeId as! String), inSection: 0)
         self.tableView.reloadRowsAtIndexPaths([row], withRowAnimation: UITableViewRowAnimation.Fade)
+    }
+    
+    func showAlert(notification: NSNotification) {
+        SVProgressHUD.dismiss()
+        guard let info = notification.userInfo!["info"] as? [String: String] else {
+            return
+        }
+        let alert: UIAlertController = UIAlertController(
+            title: info["title"],
+            message: info["message"],
+            preferredStyle:  UIAlertControllerStyle.Alert
+        )
+        let defaultAction: UIAlertAction = UIAlertAction(
+            title: "再試行",
+            style: UIAlertActionStyle.Default,
+            handler: {(action: UIAlertAction!) -> Void in
+                SVProgressHUD.show()
+                self.places.generatePlaces(self.clLat, lng: self.clLng)
+            }
+        )
+        alert.addAction(defaultAction)
+        presentViewController(alert, animated: true, completion: nil)
     }
     
 

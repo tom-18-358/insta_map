@@ -19,7 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         //エラーハンドリング - slack通知されず・・・
         NSSetUncaughtExceptionHandler{ exception in
             let alertText: String = "name: \(exception.name)\nreason: \(exception.reason) \ncallStackSymbols: \(exception.callStackSymbols)"
-            ErrorUtil.shared.alert(alertText)
+            ErrorUtil.shared.alert(alertText, toCustomerText: nil)
         }
         return true
     }

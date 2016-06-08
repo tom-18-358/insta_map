@@ -62,11 +62,26 @@ class Request: NSObject {
             headers: header
         ).responseJSON { response in
             guard let _response = response.result.value else {
-                ErrorUtil.shared.warning("API取得失敗 \n  url : \(url) \n  response : \(response)")
+                ErrorUtil.shared.alert(
+                    "API取得失敗 \n  url : \(url) \n  response : \(response)",
+                    toCustomerText: "投稿取得失敗"
+                )
                 return
             }
+            let meta = _response["meta"] as! NSDictionary
+            if meta["code"] as! Int != 200 {
+                ErrorUtil.shared.alert(
+                    "API取得失敗 \n  url : \(url) \n  response : \(response)",
+                    toCustomerText: "投稿取得失敗"
+                )
+                return
+            }
+            
             if response.result.isFailure {
-                ErrorUtil.shared.warning("API取得失敗 \n  url : \(url) \n  response : \(response)")
+                ErrorUtil.shared.alert(
+                    "API取得失敗 \n  url : \(url) \n  response : \(response)",
+                    toCustomerText: "投稿取得失敗"
+                )
                 return
             }
             callBack(result: JSON(_response))

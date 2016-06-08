@@ -19,6 +19,14 @@ class ArticlesViewController: UIViewController, UICollectionViewDelegate, UIColl
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        if self.place.articles.list.count == 0 {
+            ErrorUtil.shared.warning(
+                "表示する投稿がありません・・・\n" +
+                "placeId     : \(place.id)\n" +
+                "placeName   : \(place.name)",
+                toCustomerText: "投稿がありません"
+            )
+        }
         self.place.articles.ATdelefate = self
     }
     
