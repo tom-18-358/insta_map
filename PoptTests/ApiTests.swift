@@ -78,7 +78,7 @@ class ApiTests: QuickSpec {
                     responseStatus = true
                 }
         }
-        expect(responseStatus).toEventually(equal(true), timeout: 10)
+        expect(responseStatus).toEventually(equal(true), timeout: TEST.API_.VALID_TIMEOUT_SEC)
     }
     
     /**

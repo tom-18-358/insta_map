@@ -50,3 +50,33 @@ struct HTTP_METHOD {
     static let PATCH  = "PATCH"
     static let DELETE = "DELETE"
 }
+
+
+//MARK: USE TEST
+struct TEST {
+    struct API_ {
+        struct SLACK {
+            static let POST_URL: String          = "https://hooks.slack.com/services/TYPE_CH"
+            static let BODY: [String: String]    = ["text" : "slack test is ok"]
+            static let HEADERS: [String: String] = ["Content-Type" : "application/json"]
+        }
+        struct INSTAGRAM {
+            static let GET_LOCALES_BY_LOCALE_URL: String  =
+                API.INSTA.BASE_URL
+                + API.INSTA.PRAM.LOCATIONS
+                + API.INSTA.PRAM.SEARCH
+                + API.INSTA.PRAM.ACCESS_TOKEN
+                + API.INSTA.PRAM.LAT + "35.533127"
+                + API.INSTA.PRAM.LNG + "139.701059"
+                + API.INSTA.PRAM.DISTANCE + API.INSTA.SEARCH_DISTANCE
+            static let GET_ARTICLES_BY_LOCALE_URL: String =
+                API.INSTA.BASE_URL
+                + API.INSTA.PRAM.LOCATIONS
+                + "/238512754"
+                + API.INSTA.PRAM.MEDIA_RECENT
+                + API.INSTA.PRAM.ACCESS_TOKEN
+        }
+        static let VALID_STATUS_CODE: Int    = 200
+        static let VALID_TIMEOUT_SEC: Double = 10
+    }
+}
