@@ -117,7 +117,6 @@ class ArticlesModel: NSObject {
             totalLikeCount = totalLikeCount! + articleStruct.likeCount
             self.list.append(articleStruct)
         }
-        self.list = self.list.sort { $0.likeCount < $1.likeCount }
         self.ATdelefate.getedArticles()
     }
 

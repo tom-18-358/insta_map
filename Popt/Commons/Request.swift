@@ -89,27 +89,6 @@ class Request: NSObject {
     }
     
     /**
-     HttpMethod毎にレスポンス処理を変更
-     TODO: これは一時的なもんです。作り込んでいく中でモデルも選べるようにする
-     */
-    private func distributesResponce(response: AnyObject) {
-        switch _method {
-        case Method.GET:
-            self.requestDelegate?.success(JSON(response))
-        case Method.PUT:
-            SVProgressHUD.dismiss()
-        case Method.POST:
-            SVProgressHUD.dismiss()
-        case Method.PATCH:
-            SVProgressHUD.dismiss()
-        case Method.DELETE:
-            SVProgressHUD.dismiss()
-        default:
-            _method = Method.GET
-        }
-    }
-    
-    /**
      HttpMethodをAlmofire用の型に変換
      @param method メソッド名
      */

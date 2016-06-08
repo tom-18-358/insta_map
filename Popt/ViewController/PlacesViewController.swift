@@ -31,7 +31,7 @@ class PlacesViewController: UIViewController, CurrentLocationDelegate, PlacesMod
         
         setObserver()
         requestCurrentLocation()
-        requestPlaceAndArticle()
+        setPlace()
         
         self.tableView.delegate = self
         self.mapView.delegate = self
@@ -115,7 +115,7 @@ class PlacesViewController: UIViewController, CurrentLocationDelegate, PlacesMod
     
     
 //MARK: - Instaより場所,投稿を取得
-    private func requestPlaceAndArticle() {
+    private func setPlace() {
         self.places = PlacesModel()
         self.places.PMDelegate = self
     }
