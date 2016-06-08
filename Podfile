@@ -20,9 +20,9 @@ target 'Popt' do
 #    inherit! :search_paths
   end
 
-  target 'PoptUITests' do
-    testing_pods
-#    inherit! :search_paths
-  end
+#  target 'PoptUITests' do
+#    testing_pods
+##    inherit! :search_paths
+#  end
 
 end
